@@ -1,17 +1,19 @@
 package hoverfly
 
 import (
-	log "github.com/Sirupsen/logrus"
-	"github.com/rusenask/goproxy"
 	"bufio"
 	"crypto/tls"
 	"fmt"
-	"github.com/SpectoLabs/hoverfly/authentication/backends"
-	"github.com/SpectoLabs/hoverfly/cache"
-	"github.com/SpectoLabs/hoverfly/metrics"
 	"net"
 	"net/http"
 	"regexp"
+	"time"
+
+	log "github.com/Sirupsen/logrus"
+	"github.com/SpectoLabs/hoverfly/authentication/backends"
+	"github.com/SpectoLabs/hoverfly/cache"
+	"github.com/SpectoLabs/hoverfly/metrics"
+	"github.com/rusenask/goproxy"
 )
 
 // SimulateMode - default mode when Hoverfly looks for captured requests to respond
@@ -194,6 +196,23 @@ func (d *Hoverfly) processRequest(req *http.Request) (*http.Request, *http.Respo
 	}
 
 	newResponse := d.getResponse(req)
+
+	// introduce response delay
+	if d.Cfg.ResponseDelay > 0 {
+
+		log.WithFields(log.Fields{
+			"mode":          mode,
+			"middleware":    d.Cfg.Middleware,
+			"responseDelay": d.Cfg.ResponseDelay,
+			"path":          req.URL.Path,
+			"rawQuery":      req.URL.RawQuery,
+			"method":        req.Method,
+			"destination":   req.Host,
+		}).Debug("Introducing response delay")
+
+		time.Sleep(time.Duration(d.Cfg.ResponseDelay) * time.Millisecond)
+	}
+
 	return req, newResponse
 
 }

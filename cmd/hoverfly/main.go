@@ -65,10 +65,12 @@ var (
 	dev         = flag.Bool("dev", false, "supply -dev flag to serve directly from ./static/dist instead from statik binary")
 	destination = flag.String("destination", ".", "destination URI to catch")
 
-	addNew       = flag.Bool("add", false, "add new user '-add -username hfadmin -password hfpass'")
-	addUser      = flag.String("username", "", "username for new user")
-	addPassword  = flag.String("password", "", "password for new user")
-	isAdmin      = flag.Bool("admin", true, "supply '-admin false' to make this non admin user (defaults to 'true') ")
+	responseDelay = flag.Uint64("response-delay", 0, "response delay in milliseconds - only applies when the mode is in simulation")
+
+	addNew      = flag.Bool("add", false, "add new user '-add -username hfadmin -password hfpass'")
+	addUser     = flag.String("username", "", "username for new user")
+	addPassword = flag.String("password", "", "password for new user")
+	isAdmin     = flag.Bool("admin", true, "supply '-admin false' to make this non admin user (defaults to 'true') ")
 	authEnabled = flag.Bool("auth", false, "enable authentication, currently it is disabled by default")
 
 	generateCA = flag.Bool("generate-ca-cert", false, "generate CA certificate and private key for MITM")
@@ -197,6 +199,9 @@ func main() {
 	// overriding default middleware setting
 	cfg.Middleware = *middleware
 
+	// set the response delay if the user has passed in
+	cfg.ResponseDelay = *responseDelay
+
 	// setting default mode
 	mode := hv.SimulateMode
 
@@ -232,7 +237,7 @@ func main() {
 	cfg.SetMode(mode)
 
 	// disabling authentication if no-auth for auth disabled env variable
-	if (*authEnabled) {
+	if *authEnabled {
 		cfg.AuthEnabled = true
 	}
 

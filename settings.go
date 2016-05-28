@@ -17,6 +17,8 @@ type Configuration struct {
 	Middleware   string
 	DatabasePath string
 
+	ResponseDelay uint64
+
 	TLSVerification bool
 
 	Verbose     bool
@@ -61,7 +63,7 @@ const DefaultJWTExpirationDelta = 1 * 24 * 60 * 60
 
 // Environment variables
 const (
-	HoverflyAuthEnabledEV = "HoverflyAuthEnabled"
+	HoverflyAuthEnabledEV     = "HoverflyAuthEnabled"
 	HoverflySecretEV          = "HoverflySecret"
 	HoverflyTokenExpirationEV = "HoverflyTokenExpiration"
 
